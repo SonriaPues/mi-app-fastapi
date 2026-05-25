@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Error del servidor — Book Hub{% endblock %}
+{% block content %}
+<div class="error-page" id="error-500-page">
+    <div class="error-content">
+        <div class="error-code">500</div>
+        <h1 class="error-title">Error interno del servidor</h1>
+        <p class="error-message">Algo salió mal de nuestro lado. Por favor intenta de nuevo.</p>
+        <a href="/" class="btn-primary" id="go-home-btn">🏠 Volver al inicio</a>
+    </div>
+    <div class="error-decoration" aria-hidden="true">⚙️😵</div>
+</div>
+{% endblock %}

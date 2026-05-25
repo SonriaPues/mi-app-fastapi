@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Favoritos — Book Hub{% endblock %}
+{% block meta_description %}Tu lista personal de libros favoritos en Book Hub.{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header" id="favorites-header">
+        <h1 class="page-title">❤️ Mis Favoritos</h1>
+        <p class="page-subtitle">{{ books|length }} libro{{ 's' if books|length != 1 else '' }} guardado{{ 's' if books|length != 1 else '' }}</p>
+    </div>
+
+    {% if books %}
+    <div class="books-grid" id="favorites-grid">
+        {% for book in books %}
+        <article class="book-card" id="fav-card-{{ book.id }}">
+            <a href="/books/{{ book.id }}" class="book-card-link">
+                <div class="book-cover-wrapper">
+                    {% if book.cover_url %}
+                        <img src="{{ book.cover_url }}" alt="Portada de {{ book.title }}" class="book-cover" loading="lazy" onerror="this.src='/static/img/no-cover.svg'">
+                    {% else %}
+                        <div class="book-cover-placeholder">
+                            <span class="placeholder-icon">📚</span>
+                        </div>
+                    {% endif %}
+                    <div class="book-overlay"><span class="overlay-text">Ver detalles</span></div>
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title">{{ book.title }}</h3>
+                    <p class="book-author">{{ book.author }}</p>
+                </div>
+            </a>
+            <button
+                class="fav-btn active"
+                id="fav-btn-{{ book.id }}"
+                data-book-id="{{ book.id }}"
+                aria-label="Quitar de favoritos"
+                title="Quitar de favoritos"
+            >❤️</button>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" id="empty-favorites">
+        <div class="empty-icon">💔</div>
+        <h3>Aún no tienes favoritos</h3>
+        <p>Explora el catálogo y guarda los libros que más te gusten.</p>
+        <a href="/" class="btn-primary" id="explore-catalog-btn">Explorar catálogo</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

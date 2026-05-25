@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesión — Book Hub{% endblock %}
+{% block meta_description %}Inicia sesión en Book Hub para acceder a tus favoritos y reseñas.{% endblock %}
+
+{% block content %}
+<div class="auth-page" id="login-page">
+    <div class="auth-card" id="login-card">
+        <div class="auth-header">
+            <div class="auth-logo">📚</div>
+            <h1 class="auth-title">Bienvenido de vuelta</h1>
+            <p class="auth-subtitle">Ingresa a tu cuenta de Book Hub</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error" id="login-error" role="alert">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <form class="auth-form" method="post" action="/login" id="login-form">
+            <div class="form-group">
+                <label for="username" class="form-label">Usuario</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input
+                        type="text"
+                        name="username"
+                        id="username"
+                        class="form-input"
+                        placeholder="tu_usuario"
+                        required
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="30"
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="••••••••"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="toggle-password" id="toggle-password" aria-label="Ver contraseña">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full" id="login-submit-btn">
+                Iniciar sesión
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>¿No tienes cuenta? <a href="/register" id="go-to-register">Regístrate gratis</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

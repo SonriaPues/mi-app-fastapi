@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Página no encontrada — Book Hub{% endblock %}
+{% block content %}
+<div class="error-page" id="error-404-page">
+    <div class="error-content">
+        <div class="error-code">404</div>
+        <h1 class="error-title">¡Ups! Página no encontrada</h1>
+        <p class="error-message">La página que buscas no existe o fue movida.</p>
+        <a href="/" class="btn-primary" id="go-home-btn">🏠 Volver al inicio</a>
+    </div>
+    <div class="error-decoration" aria-hidden="true">🔍📚</div>
+</div>
+{% endblock %}

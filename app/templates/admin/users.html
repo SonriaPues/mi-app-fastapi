@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios — Admin — Book Hub{% endblock %}
+
+{% block content %}
+<div class="admin-layout" id="admin-layout">
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-icon">⚡</span>
+            <span class="sidebar-title">Panel Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin" class="sidebar-link" id="sidebar-dashboard">📊 Dashboard</a>
+            <a href="/admin/books" class="sidebar-link" id="sidebar-books">📚 Libros</a>
+            <a href="/admin/users" class="sidebar-link active" id="sidebar-users">👥 Usuarios</a>
+            <a href="/" class="sidebar-link" id="sidebar-catalog">🏠 Ir al catálogo</a>
+        </nav>
+    </aside>
+
+    <div class="admin-main" id="admin-main">
+        <div class="admin-page-header">
+            <h1 class="admin-page-title">👥 Gestión de Usuarios</h1>
+        </div>
+
+        {% if request.query_params.get('success') %}
+        <div class="alert alert-success" id="success-alert">✅ {{ request.query_params.get('success') }}</div>
+        {% endif %}
+        {% if request.query_params.get('error') %}
+        <div class="alert alert-error" id="error-alert">⚠️ {{ request.query_params.get('error') }}</div>
+        {% endif %}
+
+        <div class="admin-card" id="users-table-card">
+            <h2 class="admin-card-title">Todos los usuarios ({{ users|length }})</h2>
+            <div class="table-wrapper">
+                <table class="admin-table" id="users-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Registrado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr id="row-user-{{ u.id }}" class="{% if not u.is_active %}row-inactive{% endif %}">
+                            <td>
+                                <div class="user-cell">
+                                    <span class="user-avatar-sm">{{ u.username[0].upper() }}</span>
+                                    {{ u.username }}
+                                    {% if u.id == user.id %}
+                                        <span class="badge badge-you">Tú</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="role-badge role-{{ u.role }}">{{ u.role }}</span>
+                            </td>
+                            <td>
+                                <span class="status-badge {% if u.is_active %}status-active{% else %}status-blocked{% endif %}">
+                                    {% if u.is_active %}✅ Activo{% else %}🚫 Bloqueado{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <time>{{ u.created_at.strftime('%d/%m/%Y') if u.created_at else '—' }}</time>
+                            </td>
+                            <td class="actions-cell">
+                                {% if u.id != user.id %}
+                                <form action="/admin/users/{{ u.id }}/toggle-active" method="post" class="inline-form">
+                                    <button type="submit" class="btn-sm {% if u.is_active %}btn-warning{% else %}btn-success{% endif %}" id="toggle-active-{{ u.id }}">
+                                        {% if u.is_active %}🚫 Bloquear{% else %}✅ Desbloquear{% endif %}
+                                    </button>
+                                </form>
+                                <form action="/admin/users/{{ u.id }}/toggle-role" method="post" class="inline-form">
+                                    <button type="submit" class="btn-sm btn-secondary" id="toggle-role-{{ u.id }}">
+                                        {% if u.role == 'admin' %}👤 Hacer usuario{% else %}⚡ Hacer admin{% endif %}
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="no-actions">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

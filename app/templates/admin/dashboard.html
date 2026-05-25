@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Admin — Book Hub{% endblock %}
+
+{% block content %}
+<div class="admin-layout" id="admin-layout">
+    <!-- Sidebar admin -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-icon">⚡</span>
+            <span class="sidebar-title">Panel Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin" class="sidebar-link active" id="sidebar-dashboard">📊 Dashboard</a>
+            <a href="/admin/books" class="sidebar-link" id="sidebar-books">📚 Libros</a>
+            <a href="/admin/users" class="sidebar-link" id="sidebar-users">👥 Usuarios</a>
+            <a href="/" class="sidebar-link" id="sidebar-catalog">🏠 Ir al catálogo</a>
+        </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <div class="admin-main" id="admin-main">
+        <div class="admin-page-header">
+            <h1 class="admin-page-title">Dashboard</h1>
+            <p class="admin-page-subtitle">Bienvenido, <strong>{{ user.username }}</strong> ⚡</p>
+        </div>
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card stat-books" id="stat-books">
+                <div class="stat-icon">📚</div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.total_books }}</div>
+                    <div class="stat-label">Libros en catálogo</div>
+                </div>
+            </div>
+            <div class="stat-card stat-users" id="stat-users">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.total_users }}</div>
+                    <div class="stat-label">Usuarios registrados</div>
+                </div>
+            </div>
+            <div class="stat-card stat-reviews" id="stat-reviews">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.total_reviews }}</div>
+                    <div class="stat-label">Reseñas publicadas</div>
+                </div>
+            </div>
+            <div class="stat-card stat-new-users" id="stat-new-users">
+                <div class="stat-icon">🆕</div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.new_users }}</div>
+                    <div class="stat-label">Nuevos usuarios (7 días)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Libro más favoriteado -->
+        {% if stats.top_fav %}
+        <div class="admin-card top-fav-card" id="top-fav-card">
+            <h2 class="admin-card-title">🏆 Libro más favoriteado</h2>
+            <div class="top-fav-info">
+                <div class="top-fav-details">
+                    <p class="top-fav-title">{{ stats.top_fav.title }}</p>
+                    <p class="top-fav-author">{{ stats.top_fav.author }}</p>
+                    <p class="top-fav-count">❤️ {{ stats.top_fav.count }} usuario{{ 's' if stats.top_fav.count != 1 else '' }} lo tienen en favoritos</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Acciones rápidas -->
+        <div class="admin-card" id="quick-actions-card">
+            <h2 class="admin-card-title">⚡ Acciones rápidas</h2>
+            <div class="quick-actions">
+                <a href="/admin/books" class="quick-action-btn" id="qa-books">
+                    <span>📚</span>
+                    <span>Gestionar libros</span>
+                </a>
+                <a href="/admin/users" class="quick-action-btn" id="qa-users">
+                    <span>👥</span>
+                    <span>Gestionar usuarios</span>
+                </a>
+                <a href="/docs" target="_blank" class="quick-action-btn" id="qa-docs">
+                    <span>📄</span>
+                    <span>API Docs</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

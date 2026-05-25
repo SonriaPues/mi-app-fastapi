@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Cuenta — Book Hub{% endblock %}
+{% block meta_description %}Crea tu cuenta gratuita en Book Hub y empieza a explorar libros.{% endblock %}
+
+{% block content %}
+<div class="auth-page" id="register-page">
+    <div class="auth-card" id="register-card">
+        <div class="auth-header">
+            <div class="auth-logo">📚</div>
+            <h1 class="auth-title">Únete a Book Hub</h1>
+            <p class="auth-subtitle">Crea tu cuenta y empieza a explorar</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error" id="register-error" role="alert">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <form class="auth-form" method="post" action="/register" id="register-form">
+            <div class="form-group">
+                <label for="username" class="form-label">Nombre de usuario</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input
+                        type="text"
+                        name="username"
+                        id="username"
+                        class="form-input"
+                        placeholder="tu_usuario"
+                        required
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="30"
+                        pattern="[a-zA-Z0-9_]+"
+                        title="Solo letras, números y guiones bajos"
+                    >
+                </div>
+                <small class="form-hint">Entre 3 y 30 caracteres. Solo letras, números y _</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Mínimo 8 caracteres"
+                        required
+                        autocomplete="new-password"
+                        minlength="8"
+                    >
+                    <button type="button" class="toggle-password" id="toggle-password" aria-label="Ver contraseña">👁️</button>
+                </div>
+                <small class="form-hint">Mínimo 8 caracteres, una letra y un número</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">Confirmar contraseña</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔒</span>
+                    <input
+                        type="password"
+                        name="confirm_password"
+                        id="confirm_password"
+                        class="form-input"
+                        placeholder="Repite tu contraseña"
+                        required
+                        autocomplete="new-password"
+                    >
+                </div>
+            </div>
+
+            <!-- Indicador de fuerza de contraseña -->
+            <div class="password-strength" id="password-strength">
+                <div class="strength-bar">
+                    <div class="strength-fill" id="strength-fill"></div>
+                </div>
+                <span class="strength-label" id="strength-label">Escribe una contraseña</span>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full" id="register-submit-btn">
+                Crear cuenta
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>¿Ya tienes cuenta? <a href="/login" id="go-to-login">Iniciar sesión</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/auth.js"></script>
+{% endblock %}

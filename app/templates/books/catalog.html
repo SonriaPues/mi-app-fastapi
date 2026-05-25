@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo — Book Hub{% endblock %}
+{% block meta_description %}Explora nuestro catálogo de libros clásicos y modernos. Guarda tus favoritos y deja tus reseñas.{% endblock %}
+
+{% block content %}
+<!-- ─── HERO ────────────────────────────────────────────────────────── -->
+<section class="hero" id="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            Tu próximo libro favorito<br>
+            <span class="hero-accent">te está esperando</span>
+        </h1>
+        <p class="hero-subtitle">
+            Descubre clásicos y bestsellers, guarda tus favoritos y comparte tus reseñas con la comunidad.
+        </p>
+        {% if not user %}
+        <div class="hero-actions">
+            <a href="/register" class="btn-primary btn-lg" id="hero-register-btn">Empezar gratis</a>
+            <a href="/login" class="btn-outline btn-lg" id="hero-login-btn">Ya tengo cuenta</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="hero-decoration" aria-hidden="true">
+        <div class="floating-book book-1">📖</div>
+        <div class="floating-book book-2">📗</div>
+        <div class="floating-book book-3">📕</div>
+        <div class="floating-book book-4">📘</div>
+    </div>
+</section>
+
+<!-- ─── BARRA DE BÚSQUEDA Y FILTROS ──────────────────────────────────── -->
+<section class="catalog-header" id="catalog-section">
+    <div class="container">
+        <div class="catalog-meta">
+            {% if query %}
+                <h2 class="catalog-title">Resultados para "<em>{{ query }}</em>"</h2>
+                <p class="catalog-count">{{ total }} libro{{ 's' if total != 1 else '' }} encontrado{{ 's' if total != 1 else '' }}</p>
+                <a href="/" class="clear-search" id="clear-search-btn">✕ Limpiar búsqueda</a>
+            {% else %}
+                <h2 class="catalog-title">Catálogo de Libros</h2>
+                <p class="catalog-count">{{ total }} libro{{ 's' if total != 1 else '' }} disponible{{ 's' if total != 1 else '' }}</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ─── GRID DE LIBROS ─────────────────────────────────────────────── -->
+<section class="catalog-grid-section">
+    <div class="container">
+        {% if books %}
+            <div class="books-grid" id="books-grid">
+                {% for book in books %}
+                <article class="book-card" id="book-card-{{ book.id }}">
+                    <a href="/books/{{ book.id }}" class="book-card-link">
+                        <div class="book-cover-wrapper">
+                            {% if book.cover_url %}
+                                <img
+                                    src="{{ book.cover_url }}"
+                                    alt="Portada de {{ book.title }}"
+                                    class="book-cover"
+                                    loading="lazy"
+                                    onerror="this.src='/static/img/no-cover.svg'"
+                                >
+                            {% else %}
+                                <div class="book-cover-placeholder">
+                                    <span class="placeholder-icon">📚</span>
+                                    <span class="placeholder-text">{{ book.title[:20] }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="book-overlay">
+                                <span class="overlay-text">Ver detalles</span>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">{{ book.title }}</h3>
+                            <p class="book-author">{{ book.author }}</p>
+                            {% if book.description %}
+                                <p class="book-excerpt">{{ book.description[:100] }}{% if book.description|length > 100 %}...{% endif %}</p>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% if user %}
+                    <button
+                        class="fav-btn {% if book.id in fav_ids %}active{% endif %}"
+                        id="fav-btn-{{ book.id }}"
+                        data-book-id="{{ book.id }}"
+                        aria-label="{% if book.id in fav_ids %}Quitar de favoritos{% else %}Agregar a favoritos{% endif %}"
+                        title="{% if book.id in fav_ids %}Quitar de favoritos{% else %}Agregar a favoritos{% endif %}"
+                    >
+                        {% if book.id in fav_ids %}❤️{% else %}🤍{% endif %}
+                    </button>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if total_pages > 1 %}
+            <nav class="pagination" id="pagination" aria-label="Paginación">
+                {% if page > 1 %}
+                    <a href="?q={{ query }}&page={{ page - 1 }}" class="page-btn" id="page-prev">← Anterior</a>
+                {% endif %}
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                        <span class="page-btn page-current" aria-current="page">{{ p }}</span>
+                    {% elif p <= 3 or p >= total_pages - 2 or (p >= page - 2 and p <= page + 2) %}
+                        <a href="?q={{ query }}&page={{ p }}" class="page-btn" id="page-{{ p }}">{{ p }}</a>
+                    {% elif p == 4 or p == total_pages - 3 %}
+                        <span class="page-ellipsis">…</span>
+                    {% endif %}
+                {% endfor %}
+                {% if page < total_pages %}
+                    <a href="?q={{ query }}&page={{ page + 1 }}" class="page-btn" id="page-next">Siguiente →</a>
+                {% endif %}
+            </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="empty-state" id="empty-catalog">
+                <div class="empty-icon">🔍</div>
+                {% if query %}
+                    <h3>Sin resultados para "{{ query }}"</h3>
+                    <p>Intenta con otro título o nombre de autor.</p>
+                    <a href="/" class="btn-primary" id="browse-all-btn">Ver todos los libros</a>
+                {% else %}
+                    <h3>El catálogo está vacío</h3>
+                    <p>Aún no hay libros cargados.</p>
+                    {% if user and user.role == "admin" %}
+                        <a href="/admin/books" class="btn-primary" id="add-books-btn">Agregar libros</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

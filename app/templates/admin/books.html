@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Libros — Admin — Book Hub{% endblock %}
+
+{% block content %}
+<div class="admin-layout" id="admin-layout">
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-icon">⚡</span>
+            <span class="sidebar-title">Panel Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/admin" class="sidebar-link" id="sidebar-dashboard">📊 Dashboard</a>
+            <a href="/admin/books" class="sidebar-link active" id="sidebar-books">📚 Libros</a>
+            <a href="/admin/users" class="sidebar-link" id="sidebar-users">👥 Usuarios</a>
+            <a href="/" class="sidebar-link" id="sidebar-catalog">🏠 Ir al catálogo</a>
+        </nav>
+    </aside>
+
+    <div class="admin-main" id="admin-main">
+        <div class="admin-page-header">
+            <h1 class="admin-page-title">📚 Gestión de Libros</h1>
+        </div>
+
+        <!-- Alertas -->
+        {% if request.query_params.get('success') %}
+        <div class="alert alert-success" id="success-alert">✅ {{ request.query_params.get('success') }}</div>
+        {% endif %}
+        {% if request.query_params.get('error') %}
+        <div class="alert alert-error" id="error-alert">⚠️ {{ request.query_params.get('error') }}</div>
+        {% endif %}
+
+        <!-- Formulario para agregar libro -->
+        <div class="admin-card" id="add-book-card">
+            <h2 class="admin-card-title">➕ Agregar libro</h2>
+            <form action="/admin/books/create" method="post" class="admin-form" id="add-book-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title" class="form-label">Título *</label>
+                        <input type="text" name="title" id="title" class="form-input" required maxlength="200" placeholder="Título del libro">
+                    </div>
+                    <div class="form-group">
+                        <label for="author" class="form-label">Autor *</label>
+                        <input type="text" name="author" id="author" class="form-input" required maxlength="150" placeholder="Nombre del autor">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="form-label">Descripción</label>
+                    <textarea name="description" id="description" class="form-input" rows="3" maxlength="2000" placeholder="Sinopsis del libro..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cover_url" class="form-label">URL de portada</label>
+                        <input type="url" name="cover_url" id="cover_url" class="form-input" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="external_link" class="form-label">Enlace externo</label>
+                        <input type="url" name="external_link" id="external_link" class="form-input" placeholder="https://...">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="add-book-submit">Agregar libro</button>
+            </form>
+        </div>
+
+        <!-- Tabla de libros -->
+        <div class="admin-card" id="books-table-card">
+            <h2 class="admin-card-title">📋 Libros ({{ books|length }})</h2>
+            <div class="table-wrapper">
+                <table class="admin-table" id="books-table">
+                    <thead>
+                        <tr>
+                            <th>Portada</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr id="row-book-{{ book.id }}">
+                            <td>
+                                {% if book.cover_url %}
+                                <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="table-cover" onerror="this.style.display='none'">
+                                {% else %}
+                                <span class="no-cover-icon">📚</span>
+                                {% endif %}
+                            </td>
+                            <td class="book-title-cell">{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td class="actions-cell">
+                                <a href="/admin/books/{{ book.id }}/edit" class="btn-sm btn-secondary" id="edit-book-{{ book.id }}">✏️ Editar</a>
+                                <form action="/admin/books/{{ book.id }}/delete" method="post" class="inline-form" onsubmit="return confirm('¿Eliminar este libro y todas sus reseñas?')">
+                                    <button type="submit" class="btn-sm btn-danger" id="delete-book-{{ book.id }}">🗑️ Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="empty-cell">No hay libros cargados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

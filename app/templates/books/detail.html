@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} — Book Hub{% endblock %}
+{% block meta_description %}{{ book.description[:160] if book.description else book.title + ' de ' + book.author + ' en Book Hub.' }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Back -->
+    <a href="/" class="back-link" id="back-to-catalog">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m15 18-6-6 6-6"/>
+        </svg>
+        Volver al catálogo
+    </a>
+
+    <!-- ─── DETALLE DEL LIBRO ──────────────────────────────────────── -->
+    <div class="book-detail" id="book-detail">
+        <!-- Portada -->
+        <div class="book-detail-cover">
+            {% if book.cover_url %}
+                <img src="{{ book.cover_url }}" alt="Portada de {{ book.title }}" class="detail-cover-img" id="detail-cover-img">
+            {% else %}
+                <div class="detail-cover-placeholder">
+                    <span>📚</span>
+                </div>
+            {% endif %}
+
+            <!-- Acciones rápidas -->
+            <div class="detail-actions">
+                {% if user %}
+                <button
+                    class="btn-fav-detail {% if is_fav %}active{% endif %}"
+                    id="detail-fav-btn"
+                    data-book-id="{{ book.id }}"
+                >
+                    <span class="fav-icon">{% if is_fav %}❤️{% else %}🤍{% endif %}</span>
+                    <span class="fav-text">{% if is_fav %}En favoritos{% else %}Agregar a favoritos{% endif %}</span>
+                </button>
+                {% endif %}
+                {% if book.external_link %}
+                <a href="{{ book.external_link }}" target="_blank" rel="noopener" class="btn-external" id="external-link-btn">
+                    📖 Leer online
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Información -->
+        <div class="book-detail-info">
+            <div class="book-detail-meta">
+                <span class="detail-badge">Libro</span>
+                {% if avg_rating > 0 %}
+                <span class="detail-rating">
+                    ⭐ {{ avg_rating }} / 5
+                    <small>({{ reviews|length }} reseña{{ 's' if reviews|length != 1 else '' }})</small>
+                </span>
+                {% endif %}
+            </div>
+            <h1 class="detail-title" id="book-title">{{ book.title }}</h1>
+            <p class="detail-author" id="book-author">por <strong>{{ book.author }}</strong></p>
+
+            {% if book.description %}
+            <div class="detail-description" id="book-description">
+                <h2 class="section-label">Sinopsis</h2>
+                <p>{{ book.description }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Estrellas promedio visual -->
+            {% if avg_rating > 0 %}
+            <div class="avg-stars-visual">
+                {% for i in range(1, 6) %}
+                    <span class="star {% if i <= avg_rating %}filled{% elif i - 0.5 <= avg_rating %}half{% endif %}">★</span>
+                {% endfor %}
+                <span class="avg-label">{{ avg_rating }} de 5</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ─── SECCIÓN DE RESEÑAS ─────────────────────────────────────── -->
+    <section class="reviews-section" id="reviews-section">
+        <h2 class="reviews-title">Reseñas <span class="reviews-count">({{ reviews|length }})</span></h2>
+
+        <!-- Formulario de reseña -->
+        {% if user %}
+            {% if user_review %}
+            <!-- Editar reseña existente -->
+            <div class="review-form-card" id="review-form-card">
+                <h3>Tu reseña</h3>
+                <form id="edit-review-form" data-review-id="{{ user_review.id }}" data-book-id="{{ book.id }}">
+                    <div class="star-picker" id="star-picker-edit" data-value="{{ user_review.rating }}">
+                        {% for i in range(1, 6) %}
+                        <label class="star-label">
+                            <input type="radio" name="rating" value="{{ i }}" {% if user_review.rating == i %}checked{% endif %}>
+                            <span class="star-pick {% if i <= user_review.rating %}active{% endif %}">★</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <textarea name="comment" id="edit-comment" rows="4" maxlength="1000" placeholder="Escribe tu reseña...">{{ user_review.comment }}</textarea>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="update-review-btn">Actualizar reseña</button>
+                        <button type="button" class="btn-danger" id="delete-review-btn" data-review-id="{{ user_review.id }}">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <!-- Nueva reseña -->
+            <div class="review-form-card" id="review-form-card">
+                <h3>Escribe una reseña</h3>
+                <form id="create-review-form" data-book-id="{{ book.id }}">
+                    <div class="star-picker" id="star-picker-new">
+                        {% for i in range(1, 6) %}
+                        <label class="star-label">
+                            <input type="radio" name="rating" value="{{ i }}" {% if i == 5 %}checked{% endif %}>
+                            <span class="star-pick {% if i == 5 %}active{% endif %}">★</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <textarea name="comment" id="new-comment" rows="4" maxlength="1000" placeholder="Cuéntanos qué te pareció el libro..."></textarea>
+                    <button type="submit" class="btn-primary" id="submit-review-btn">Publicar reseña</button>
+                </form>
+            </div>
+            {% endif %}
+        {% else %}
+        <div class="login-prompt" id="login-prompt">
+            <p>¿Quieres dejar una reseña? <a href="/login">Inicia sesión</a> o <a href="/register">regístrate gratis</a>.</p>
+        </div>
+        {% endif %}
+
+        <!-- Lista de reseñas -->
+        <div class="reviews-list" id="reviews-list">
+            {% for review in reviews %}
+            {% if not user_review or review.id != user_review.id %}
+            <article class="review-card" id="review-card-{{ review.id }}">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <span class="reviewer-avatar">{{ review.username[0].upper() }}</span>
+                        <span class="reviewer-name">{{ review.username }}</span>
+                    </div>
+                    <div class="review-meta">
+                        <div class="review-stars">
+                            {% for i in range(1, 6) %}
+                                <span class="star {% if i <= review.rating %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                        {% if user and user.role == "admin" %}
+                        <button class="btn-icon-danger" data-review-id="{{ review.id }}" onclick="deleteReviewAdmin('{{ review.id }}')">🗑️</button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if review.comment %}
+                <p class="review-comment">{{ review.comment }}</p>
+                {% endif %}
+                <time class="review-date" datetime="{{ review.created_at }}">
+                    {{ review.created_at.strftime('%d/%m/%Y') if review.created_at else '' }}
+                </time>
+            </article>
+            {% endif %}
+            {% endfor %}
+
+            {% if not reviews %}
+            <div class="empty-state" id="no-reviews">
+                <p>🌟 Sé el primero en dejar una reseña.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Datos del libro pasados al JS para operaciones AJAX
+    const BOOK_ID = "{{ book.id }}";
+    const IS_AUTH = {{ 'true' if user else 'false' }};
+    const USER_REVIEW_ID = "{{ user_review.id if user_review else '' }}";
+</script>
+<script src="/static/js/detail.js"></script>
+{% endblock %}
